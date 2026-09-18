@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pi Tunnel</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="description" content="A macOS menu bar app that shows the state of an SSH port-forwarding tunnel to a Raspberry Pi, one brick per port.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-alt: #f5f5f7;
+    --text: #1d1d1f;
+    --text-dim: #6e6e73;
+    --border: #d8d8dc;
+    --accent: #0a6cff;
+    --accent-text: #ffffff;
+    --code-bg: #f5f5f7;
+    --code-text: #1d1d1f;
+    --dot-open: #22a446;
+    --dot-down: #9a9a9e;
+    --dot-busy: #d98311;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121214;
+      --bg-alt: #1b1b1e;
+      --text: #f2f2f3;
+      --text-dim: #a0a0a6;
+      --border: #303034;
+      --accent: #3b8eff;
+      --accent-text: #05070a;
+      --code-bg: #1b1b1e;
+      --code-text: #e8e8ea;
+      --dot-open: #37c95a;
+      --dot-down: #7a7a80;
+      --dot-busy: #e6a23c;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html { background: var(--bg); }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  header.hero {
+    padding: 64px 0 40px;
+    text-align: center;
+  }
+
+  .mark {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 20px;
+    display: block;
+    color: var(--text);
+  }
+
+  h1 {
+    font-size: 34px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+  }
+
+  .pitch {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 520px;
+    margin: 0 auto 28px;
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .btn {
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 11px 22px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-text);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  figure {
+    margin: 40px 0;
+  }
+
+  figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  figcaption {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: center;
+  }
+
+  section {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+  }
+
+  .points {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 16px;
+  }
+
+  .points li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .dot {
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 7px;
+  }
+
+  .dot-open { background: var(--dot-open); }
+  .dot-down { background: var(--dot-down); }
+  .dot-busy { background: var(--dot-busy); }
+
+  .points strong {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+
+  .points span {
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .note {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 20px;
+  }
+
+  .note code {
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12.5px;
+  }
+
+  footer {
+    padding: 32px 0 56px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  footer a {
+    color: var(--text-dim);
+  }
+
+  a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 480px) {
+    header.hero { padding: 48px 0 32px; }
+    h1 { font-size: 28px; }
+    .pitch { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <svg class="mark" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M4 19V11A7 7 0 0 1 18 11V19" stroke="currentColor" stroke-width="4.4" stroke-dasharray="3.1 1.2" stroke-linecap="butt"/>
+      <path d="M2 20H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <h1>Pi Tunnel</h1>
+    <p class="pitch">A macOS menu bar app that shows the state of an SSH port-forwarding tunnel to a Raspberry Pi, one brick per port.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/ByteApps/pi-tunnel/releases/latest">Download for macOS</a>
+      <a class="btn btn-secondary" href="https://github.com/ByteApps/pi-tunnel">View on GitHub</a>
+    </div>
+  </header>
+
+  <figure>
+    <img src="images/menu-light.png" alt="Pi Tunnel menu open, showing 3 of 9 ports open, grouped by service">
+  </figure>
+
+  <section>
+    <h2>How it works</h2>
+    <ul class="points">
+      <li>
+        <span class="dot dot-open"></span>
+        <div><strong>One brick per port.</strong><span>The menu bar icon is a tunnel arch drawn as bricks, one for every port in your config. A brick lights up when its tunnel is actually up.</span></div>
+      </li>
+      <li>
+        <span class="dot dot-busy"></span>
+        <div><strong>Open means TCP connect and an ssh listener.</strong><span>Pi Tunnel connects to each local port and checks who's listening. Open only counts if the listener belongs to an ssh process, not just any local service.</span></div>
+      </li>
+      <li>
+        <span class="dot dot-down"></span>
+        <div><strong>Open missing ports, or close everything.</strong><span>One click opens whichever tunnels are down, or closes every ssh tunnel Pi Tunnel is managing.</span></div>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>The icon at a glance</h2>
+    <figure>
+      <img src="images/icon-states.png" alt="Pi Tunnel icon at 0 of 9, 3 of 9, 6 of 9, 9 of 9, and 7 of 12 ports open, shown in dark and light menu bars">
+      <figcaption>The icon at 0, 3, 6 and 9 of 9 ports open, plus 7 of 12. Each tile shows the zoomed glyph and the real menu bar size on light and dark; it is a template image, so macOS tints it for either appearance.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Configure</h2>
+    <p>Pi Tunnel reads <code>~/.config/pi-tunnel/ports.json</code>, created with a sample on first launch, and re-reads it on every check &mdash; no restart needed when you add a port.</p>
+    <pre><code>{
+  "host": "pi@raspberrypi.local",
+  "intervalSeconds": 5,
+  "groups": [
+    { "name": "raspberrypi", "ports": [
+      { "port": 8080, "name": "Web UI", "url": "http://127.0.0.1:8080" },
+      { "port": 3000, "name": "Grafana", "url": "http://127.0.0.1:3000" },
+      { "port": 5432, "name": "Postgres" }
+    ]}
+  ]
+}</code></pre>
+    <p>Rows with a <code>url</code> open it in your browser; other rows copy <code>127.0.0.1:&lt;port&gt;</code> to the clipboard.</p>
+    <div class="note">Releases are signed with a ByteApps LLC Developer ID and notarized by Apple, so the app opens without warnings. Requires macOS 13 or later.</div>
+  </section>
+
+  <footer>
+    <p>MIT licensed. <a href="https://github.com/ByteApps/pi-tunnel">github.com/ByteApps/pi-tunnel</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
