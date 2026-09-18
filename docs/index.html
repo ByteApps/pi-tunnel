@@ -284,19 +284,8 @@
 
   <section>
     <h2>Configure</h2>
-    <p>Pi Tunnel reads <code>~/.config/pi-tunnel/ports.json</code>, created with a sample on first launch, and re-reads it on every check &mdash; no restart needed when you add a port.</p>
-    <pre><code>{
-  "host": "pi@raspberrypi.local",
-  "intervalSeconds": 5,
-  "groups": [
-    { "name": "raspberrypi", "ports": [
-      { "port": 8080, "name": "Web UI", "url": "http://127.0.0.1:8080" },
-      { "port": 3000, "name": "Grafana", "url": "http://127.0.0.1:3000" },
-      { "port": 5432, "name": "Postgres" }
-    ]}
-  ]
-}</code></pre>
-    <p>Rows with a <code>url</code> open it in your browser; other rows copy <code>127.0.0.1:&lt;port&gt;</code> to the clipboard.</p>
+    <p>Choose <strong>Edit Ports…</strong> from the menu. The window shows the SSH host, how often to check, and a table of every port with its group, number, service name and an optional URL. Click a cell to change it, add or remove rows, then Save; the menu and the icon update immediately.</p>
+    <p>Ports in the same group are listed together in the menu. A row with a URL opens it in your browser when clicked; other rows copy <code>127.0.0.1:&lt;port&gt;</code> to the clipboard. Prefer a text editor? The window has a button that opens the underlying <code>~/.config/pi-tunnel/ports.json</code>.</p>
     <div class="note">Releases are signed with a ByteApps LLC Developer ID and notarized by Apple, so the app opens without warnings. Requires macOS 13 or later.</div>
   </section>
 

@@ -165,6 +165,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(edit)
 
         menu.addItem(.separator())
+        let more = NSMenuItem(title: "More from ByteApps…", action: #selector(openByteApps), keyEquivalent: "")
+        more.target = self
+        more.toolTip = "Open byteapps.com"
+        menu.addItem(more)
         let quit = NSMenuItem(title: "Quit Pi Tunnel", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quit)
     }
@@ -233,6 +237,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func checkNow() { probe() }
+
+    @objc private func openByteApps() {
+        NSWorkspace.shared.open(URL(string: "https://byteapps.com/")!)
+    }
 
     @objc private func toggleCount() {
         showCount.toggle()

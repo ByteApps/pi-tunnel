@@ -43,60 +43,28 @@ If that prints nothing and exits `0`, Pi Tunnel will work. If it prompts for any
 
 ## Configure
 
-Pi Tunnel reads `~/.config/pi-tunnel/ports.json`, which it creates with a sample on first launch. It re-reads the file on every check interval — no restart needed when you add or remove a port. If the file has invalid JSON, the menu shows an orange error line and Pi Tunnel keeps using the last good config.
+Choose **Edit Ports…** from the menu. The window shows the SSH host, how often to check, and a table of every port with its group, number, service name and an optional URL. Click a cell to change it, use **+** and **−** to add or remove rows, then **Save**. The menu and the icon update immediately.
 
-Schema:
-
-```json
-{
-  "host": "pi@raspberrypi.local",
-  "intervalSeconds": 5,
-  "groups": [
-    { "name": "raspberrypi", "ports": [
-      { "port": 8080, "name": "Web UI", "url": "http://127.0.0.1:8080" },
-      { "port": 3000, "name": "Grafana", "url": "http://127.0.0.1:3000" },
-      { "port": 5432, "name": "Postgres" }
-    ]}
-  ]
-}
-```
-
-- `url` is optional. Rows with a `url` open it in your browser when clicked; other rows copy `127.0.0.1:<port>` to the clipboard instead.
-- Ports are grouped under `groups`, and each group gets its own section in the menu.
-
-### Editing ports from the app
-
-**Edit Ports…** in the menu opens a window instead of the raw file: the SSH host, the check interval, and a table of every port with its group, number, service name and optional URL. Click a cell to change it, use **+** and **−** to add or remove rows, then **Save**. The file is rewritten, the menu and icon refresh right away, and the table reloads from what was written. **Cancel** closes without touching the file, and **Open JSON File…** opens `ports.json` in your editor if you prefer that.
-
-Save checks the input first: ports must be 1–65535 and unique, groups and service names cannot be empty, and a URL needs a scheme. A problem is shown in a sheet and nothing is written.
+- Ports in the same group are listed together in the menu, so name groups after whatever makes sense on your Pi: a chain, a service, a room.
+- A row with a URL opens it in your browser when clicked. Rows without one copy `127.0.0.1:<port>` to the clipboard.
+- Save checks that ports are 1–65535 and unique, that groups and service names are filled in, and that a URL has a scheme. Problems are shown in the window and nothing is written.
+- **Cancel** closes without changes. **Open JSON File…** opens the underlying file, `~/.config/pi-tunnel/ports.json`, if you prefer a text editor. The app re-reads it on the next check.
 
 ### Example: a Bitcoin node on a Pi
 
-A larger, real-world config with three groups (mainnet, testnet4, regtest) gives a 9-brick icon:
+Three groups, nine ports, a nine-brick icon:
 
-```json
-{
-  "host": "pi@raspberrypi.local",
-  "intervalSeconds": 5,
-  "groups": [
-    { "name": "mainnet", "ports": [
-      { "port": 8332, "name": "Bitcoin Core RPC" },
-      { "port": 3001, "name": "Explorer", "url": "http://127.0.0.1:3001" },
-      { "port": 50001, "name": "Electrs" }
-    ]},
-    { "name": "testnet4", "ports": [
-      { "port": 48332, "name": "Bitcoin Core RPC" },
-      { "port": 3002, "name": "Explorer", "url": "http://127.0.0.1:3002" },
-      { "port": 40001, "name": "Electrs" }
-    ]},
-    { "name": "regtest", "ports": [
-      { "port": 18443, "name": "Bitcoin Core RPC" },
-      { "port": 3003, "name": "Explorer", "url": "http://127.0.0.1:3003" },
-      { "port": 60401, "name": "Electrs" }
-    ]}
-  ]
-}
-```
+| Group | Port | Service | URL |
+|---|---|---|---|
+| mainnet | 8332 | Bitcoin Core RPC | |
+| mainnet | 3001 | Explorer | http://127.0.0.1:3001 |
+| mainnet | 50001 | Electrs | |
+| testnet4 | 48332 | Bitcoin Core RPC | |
+| testnet4 | 3002 | Explorer | http://127.0.0.1:3002 |
+| testnet4 | 40001 | Electrs | |
+| regtest | 18443 | Bitcoin Core RPC | |
+| regtest | 3003 | Explorer | http://127.0.0.1:3003 |
+| regtest | 60401 | Electrs | |
 
 ## How it decides a port is open
 
@@ -122,7 +90,8 @@ The arch's road is always drawn solid; only the bricks change. The icon is a tem
 - **Check now** (⌘R) — runs a check immediately instead of waiting for the next interval.
 - **Show count in menu bar** — off by default; toggles a text label like "3/9" next to the icon.
 - **Launch at login** — uses `SMAppService` (system login items). The app needs to live in `/Applications` or `~/Applications` for this to work.
-- **Edit Ports…** — opens the ports window described above; it also has a button to open `ports.json` directly.
+- **Edit Ports…** — opens the ports window described under Configure.
+- **More from ByteApps…** — opens byteapps.com.
 - **Quit Pi Tunnel** (⌘Q).
 
 ## Build from source
