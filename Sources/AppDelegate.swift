@@ -34,6 +34,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if CommandLine.arguments.contains("--edit-ports") { editPorts() }
     }
 
+    // MARK: pitunnel:// links
+
+    /// Launching via a link delivers it here too, possibly before the first probe.
+    func application(_ application: NSApplication, open urls: [URL]) {
+        for url in urls { handle(url) }
+    }
+
+    private func handle(_ url: URL) {
+        store.ensureExists()
+        store.reloadIfChanged()
+        let cfg = store.config
+        guard let cmd = URLCommand.parse(url, registered: cfg.allPorts.map { $0.port }) else {
+            alert("Pi Tunnel doesn't understand this link", url.absoluteString)
+            return
+        }
+        if !cmd.rejected.isEmpty {
+            alert("Pi Tunnel ignored part of a link", cmd.rejected.joined(separator: "\n"))
+        }
+        let wanted = cmd.all ? cfg.allPorts.map { $0.port } : cmd.ports
+        guard !wanted.isEmpty else { return }   // every asked port was rejected
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let states = PortProbe.probe(ports: wanted).states
+            let down = wanted.filter { states[$0] != .open && states[$0] != .busy }
+            let finish: (String?) -> Void = { error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        self?.alert("Could not open the tunnel", error)
+                    } else if let then = cmd.then {
+                        NSWorkspace.shared.open(then)
+                    }
+                    self?.probe()
+                }
+            }
+            if down.isEmpty {
+                finish(nil)
+            } else {
+                // ssh -f returns once ExitOnForwardFailure has confirmed every -L,
+                // so the page can be opened as soon as this completes.
+                TunnelController.open(ports: down, host: cfg.host, completion: finish)
+            }
+        }
+    }
+
     // MARK: polling
 
     private func restartTimerIfNeeded() {

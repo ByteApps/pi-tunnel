@@ -11,7 +11,9 @@ Public repo under the ByteApps org; site at byteapps.com/pi-tunnel from `docs/`.
   icon; `PortProbe.swift` decides open/busy/down (TCP connect + `lsof` owner);
   `TunnelController.swift` runs `ssh -f -N` / SIGTERM; `Config.swift` loads and
   saves `~/.config/pi-tunnel/ports.json`; `PortsEditor.swift` is the Edit Ports
-  window. `--edit-ports` as a launch argument opens that window at start.
+  window; `URLCommand.swift` parses `pitunnel://open?port=…&then=…` links
+  (registered ports only, `then` loopback http(s) only — keep both guards,
+  any web page can fire the scheme). `--edit-ports` as a launch argument opens that window at start.
 - `build.sh` — universal build, optional Developer ID signing + notarization,
   `--install` / `--release`. `Info.plist` holds the version.
 - `docs/` — landing page and the images the README also uses.

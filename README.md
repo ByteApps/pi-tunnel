@@ -94,6 +94,20 @@ The arch's road is always drawn solid; only the bricks change. The icon is a tem
 - **More from ByteApps…** — opens byteapps.com.
 - **Quit Pi Tunnel** (⌘Q).
 
+## Open ports from other apps
+
+Pi Tunnel registers the `pitunnel://` URL scheme, so a script, a dashboard or a bookmark can ask it to open ports instead of running its own `ssh`. Pi Tunnel stays the one thing that opens and manages your tunnels.
+
+| Link | What it does |
+|---|---|
+| `pitunnel://open` | Same as **Open missing ports** |
+| `pitunnel://open?port=8080` | Opens just that port if it's down (repeat `port=` for more) |
+| `pitunnel://open?port=8080&then=http%3A%2F%2F127.0.0.1%3A8080%2F` | …then opens the page once the tunnel is up (immediately if it already was) |
+
+From a terminal: `open 'pitunnel://open?port=8080'`.
+
+Because any web page can try a custom link, Pi Tunnel only opens ports that are already in your ports list, and only opens a `then` page that is `http`/`https` on `127.0.0.1` or `localhost`. Anything else is ignored and shown in an alert. Browsers ask before handing a link to Pi Tunnel the first time.
+
 ## Build from source
 
 Requires Xcode or the Command Line Tools. No external dependencies — plain Swift + AppKit.
