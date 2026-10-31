@@ -5,8 +5,8 @@ import Foundation
 /// opens and closes tunnels.
 ///
 ///     pitunnel://open                      open every registered port that is down
-///     pitunnel://open?port=3001            open just these (repeat `port=` for more)
-///     pitunnel://open?port=3001&then=URL   …then open URL once the ports are up
+///     pitunnel://open?port=8080            open just these (repeat `port=` for more)
+///     pitunnel://open?port=8080&then=URL   …then open URL once the ports are up
 ///
 /// Guard rails, because any web page can try a custom URL:
 /// - only ports already registered in ports.json are ever opened;
